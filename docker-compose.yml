@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./sme_draftmate.db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AI_PROVIDER=gemini
+      - SECRET_KEY=sme-draftmate-super-secret-key-2026-sebi-icdr-compliance
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/sme_draftmate.db:/app/sme_draftmate.db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

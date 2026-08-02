@@ -1,0 +1,28 @@
+# Node & Frontend dependencies
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+
+# Python & Virtual Environments
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Database & Uploads
+sme_draftmate.db
+backend/sme_draftmate.db
+uploads/
+backend/uploads/
+evidence/
+backend/evidence/
+test.pdf
+
+# Environment & IDE
+.env
+.DS_Store
+.vscode/
+.idea/
