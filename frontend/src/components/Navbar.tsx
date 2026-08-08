@@ -86,26 +86,38 @@ export const Navbar: React.FC<{ onOpenAuth: () => void }> = ({ onOpenAuth }) => 
             </button>
 
             {showRoleMenu && (
-              <div className="absolute right-0 mt-2 w-64 glass-panel rounded-xl shadow-2xl border border-slate-800 py-2 z-50">
-                <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  Switch Active Persona
+              <div className="absolute right-0 mt-2 w-72 glass-panel rounded-2xl shadow-2xl border border-slate-800 py-2 z-50 overscroll-contain max-h-[320px] overflow-y-auto">
+                <div className="px-3 py-1.5 border-b border-slate-800 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>Switch Active Persona</span>
+                  <span className="text-[10px] text-indigo-400 font-mono">Select & Confirm</span>
                 </div>
-                {(Object.keys(roleLabels) as UserRole[]).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => {
-                      switchRole(r);
-                      setShowRoleMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-indigo-500/10 transition ${user.role === r ? 'bg-indigo-600/20 font-semibold text-indigo-300' : 'text-slate-300'}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>{roleLabels[r].title}</span>
-                    </div>
-                    {user.role === r && <ShieldCheck className="w-4 h-4 text-emerald-400" />}
-                  </button>
-                ))}
+                <div className="p-1 space-y-1">
+                  {(Object.keys(roleLabels) as UserRole[]).map((r) => {
+                    const isCurrent = user.role === r;
+                    return (
+                      <button
+                        key={r}
+                        onClick={() => {
+                          switchRole(r);
+                          setShowRoleMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition ${
+                          isCurrent ? 'bg-indigo-600/20 border border-indigo-500/40 text-white font-bold' : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <UserCheck className="w-4 h-4 text-indigo-400 shrink-0" />
+                          <span>{roleLabels[r].title}</span>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded transition ${
+                          isCurrent ? 'bg-emerald-500 text-white shadow-sm' : 'bg-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white'
+                        }`}>
+                          {isCurrent ? 'OK ✓' : 'Switch OK'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
