@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../types';
-import { X, ShieldCheck, Sparkles, ArrowRight, CheckCircle2, UserCheck } from 'lucide-react';
+import { X, ShieldCheck, Sparkles, CheckCircle2, UserCheck, ArrowRight, Check } from 'lucide-react';
 
 export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { login } = useAuth();
@@ -9,16 +9,23 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
   const [email, setEmail] = useState('promoter@apexauto.co.in');
   const [password, setPassword] = useState('password123');
 
-  // Prevent background body scrolling when modal is open
+  // Complete 100% lock on background page scrolling for mobile and desktop
   useEffect(() => {
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalWidth = document.body.style.width;
+
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.width = originalWidth;
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -49,8 +56,11 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
   const currentRoleObj = rolesList.find(r => r.role === selectedRole) || rolesList[0];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overscroll-contain">
-      <div className="w-full max-w-lg glass-panel border border-slate-800 rounded-2xl shadow-2xl p-6 relative space-y-5 max-h-[90vh] overflow-y-auto overscroll-contain">
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overscroll-none select-none">
+      <div 
+        className="w-full max-w-lg glass-panel border border-slate-800 rounded-2xl shadow-2xl p-6 relative space-y-5 max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -60,20 +70,20 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         </button>
 
         {/* Modal Header */}
-        <div className="space-y-1">
+        <div className="space-y-1 shrink-0">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Persona Authentication</span>
+            <span>Select Persona & Sign In</span>
           </div>
           <h2 className="text-xl font-extrabold text-white">Sign In to SME DraftMate</h2>
-          <p className="text-xs text-slate-400">Select your persona below and click OK to confirm sign in.</p>
+          <p className="text-xs text-slate-400">Choose your active persona from the list below and click OK to confirm.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Scroll-contained Roles List */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-300">Select Persona & Role</label>
-            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 overscroll-contain border border-slate-800/80 rounded-xl p-2 bg-slate-950/60">
+        <form onSubmit={handleSubmit} className="space-y-4 flex-1 flex flex-col justify-between overflow-hidden">
+          {/* Scroll-contained Roles List with strict overscroll containment */}
+          <div className="space-y-2 overflow-hidden flex-1 flex flex-col">
+            <label className="text-xs font-bold text-slate-300">Choose Role Persona</label>
+            <div className="space-y-2 overflow-y-auto max-h-[260px] pr-1.5 overscroll-contain border border-slate-800 rounded-xl p-2 bg-slate-950/80">
               {rolesList.map((item) => {
                 const isSelected = selectedRole === item.role;
                 return (
@@ -82,8 +92,8 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                     onClick={() => handleRoleSelect(item)}
                     className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${
                       isSelected
-                        ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-md'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                        ? 'bg-indigo-600/25 border-indigo-500 text-white shadow-lg ring-1 ring-indigo-500'
+                        : 'bg-slate-900/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                     }`}
                   >
                     <div className="space-y-0.5">
@@ -95,7 +105,7 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                       <div className="text-[10px] font-mono text-slate-500">{item.email}</div>
                     </div>
 
-                    {/* OK / Select Button for each role item */}
+                    {/* OK / Confirm Action Button */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -103,13 +113,14 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                         handleRoleSelect(item);
                         handleConfirmLogin();
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0 ${
+                      className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition shrink-0 flex items-center gap-1 ${
                         isSelected
                           ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                          : 'bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700'
                       }`}
                     >
-                      {isSelected ? 'OK ✓' : 'Select OK'}
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{isSelected ? 'OK ✓' : 'OK'}</span>
                     </button>
                   </div>
                 );
@@ -118,7 +129,7 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
           </div>
 
           {/* Email & Password inputs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 shrink-0">
             <div className="space-y-1">
               <label className="text-[11px] font-semibold text-slate-300">Email Address</label>
               <input
@@ -142,8 +153,8 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
             </div>
           </div>
 
-          {/* Prominent OK & Confirm Sign In Button */}
-          <div className="pt-2 flex items-center gap-3">
+          {/* Bottom Confirmation OK Button */}
+          <div className="pt-3 flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
@@ -157,7 +168,7 @@ export const AuthModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
               className="w-2/3 py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-indigo-600 to-indigo-500 hover:opacity-90 text-white font-extrabold text-xs shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 transition"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-              <span>OK — Confirm Sign In ({currentRoleObj.label})</span>
+              <span>OK — Sign In as {currentRoleObj.label}</span>
             </button>
           </div>
         </form>
