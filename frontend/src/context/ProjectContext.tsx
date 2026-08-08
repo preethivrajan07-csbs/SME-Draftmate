@@ -39,7 +39,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setActiveProject(current);
       
       if (current) {
-        setActiveStep(current.current_step || 7);
         const docs = await api.getDocuments(current.id);
         setDocuments(docs);
         
