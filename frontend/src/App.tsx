@@ -8,7 +8,8 @@ import { Dashboard } from './components/Dashboard';
 import { ProjectStepper } from './components/ProjectStepper';
 import { CompanyMasterStep } from './components/CompanyMasterStep';
 import { DocumentUploadStep } from './components/DocumentUploadStep';
-import { OCRViewerStep } from './components/OCRViewerStep';
+import { OCRExtractionStep } from './components/OCRExtractionStep';
+import { DataVerificationStep } from './components/DataVerificationStep';
 import { QuestionnaireStep } from './components/QuestionnaireStep';
 import { ComplianceDashboardStep } from './components/ComplianceDashboardStep';
 import { DRHPEditorStep } from './components/DRHPEditorStep';
@@ -27,6 +28,7 @@ const MainLayout: React.FC = () => {
 
   const handleStartWorkflow = () => {
     setCurrentView('workflow');
+    setActiveStep(1); // Set active step explicitly to Step 1: Create Project / Company Master Data
   };
 
   const handleNextStep = () => {
@@ -43,8 +45,9 @@ const MainLayout: React.FC = () => {
       case 3:
         return <DocumentUploadStep onNext={handleNextStep} />;
       case 4:
+        return <OCRExtractionStep onNext={handleNextStep} />;
       case 5:
-        return <OCRViewerStep onNext={handleNextStep} />;
+        return <DataVerificationStep onNext={handleNextStep} />;
       case 6:
         return <QuestionnaireStep onNext={handleNextStep} />;
       case 7:
@@ -58,7 +61,7 @@ const MainLayout: React.FC = () => {
       case 11:
         return <EvidencePackageStep />;
       default:
-        return <ComplianceDashboardStep onNext={handleNextStep} />;
+        return <CompanyMasterStep onNext={handleNextStep} />;
     }
   };
 

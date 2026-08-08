@@ -22,7 +22,7 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeStep, setActiveStep] = useState<number>(7);
+  const [activeStep, setActiveStep] = useState<number>(1);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [drhpSections, setDrhpSections] = useState<DRHPSection[]>([]);
   const [complianceScore, setComplianceScore] = useState<number>(88.5);
